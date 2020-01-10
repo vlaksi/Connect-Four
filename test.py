@@ -5,6 +5,8 @@ import sys
 BROJ_REDOVA = 6
 BROJ_KOLONA = 6
 
+BELA = (255,255,255)
+SIVA = (200,200,200)
 
 #F-ja koja kreira matricu 6 puta 6, koja predstavlja tablu
 def kreiraj_tablu():
@@ -57,8 +59,11 @@ def winning_move(tabla,token):
 
 #F-ja koja vrsi renderovanje GUI-a tj prikaz nase igre
 def iscrtaj_tablu(tabla):
-	pass
-
+	for c in range(BROJ_KOLONA):
+		for r in range(BROJ_REDOVA):
+			pygame.draw.rect(screen, BELA, (c*VELICINA_KVADRATA, r*VELICINA_KVADRATA+VELICINA_KVADRATA, VELICINA_KVADRATA, VELICINA_KVADRATA))
+			pygame.draw.circle(screen, SIVA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), int(r*VELICINA_KVADRATA+VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+	
 tabla = kreiraj_tablu()
 game_over = False
 turn = 0
@@ -69,8 +74,11 @@ VELICINA_KVADRATA = 90
 width = BROJ_KOLONA * VELICINA_KVADRATA
 height = (BROJ_REDOVA+1) * VELICINA_KVADRATA
 size = (width, height)
+RADIUS = int(VELICINA_KVADRATA/2 - 5)
 screen = pygame.display.set_mode(size)
 
+iscrtaj_tablu(tabla)
+pygame.display.update()
 
 while not game_over:
 
