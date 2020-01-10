@@ -1,4 +1,6 @@
 import numpy as np 
+import pygame 
+import sys
 
 BROJ_REDOVA = 6
 BROJ_KOLONA = 6
@@ -53,35 +55,56 @@ def winning_move(tabla,token):
 			if tabla[r][c] == token and tabla[r-1][c+1] == token and tabla[r-2][c+2] == token and tabla[r-3][c+3] == token:
 				return True
 
+#F-ja koja vrsi renderovanje GUI-a tj prikaz nase igre
+def iscrtaj_tablu(tabla):
+	pass
+
 tabla = kreiraj_tablu()
 game_over = False
 turn = 0
 
+# Konfigurisanje GUI-a
+pygame.init()
+VELICINA_KVADRATA = 90
+width = BROJ_KOLONA * VELICINA_KVADRATA
+height = (BROJ_REDOVA+1) * VELICINA_KVADRATA
+size = (width, height)
+screen = pygame.display.set_mode(size)
+
+
 while not game_over:
-	# Ponudi unos prvom igracu
-	if turn == 0:
-		kolona = int(input("Igracu 1, unesite vasu kolonu (0-6):"))
 
-		if da_li_je_popunjena_kolona(tabla,kolona):
-			red = get_sledeci_slobodan_red(tabla,kolona)
-			postavi_token(tabla,red,kolona,1)
+	# Prolazak kroz Event Lisenere od koristi i njihova implementacija
+	for event in pygame.event.get():
+		if event.type == pygame.QUIT:
+			sys.exit()
 
-			if winning_move(tabla,1):
-				print("IGRAC 1 je POBEDNIK !!!")
-				game_over = True
+		if event.type == pygame.MOUSEBUTTONDOWN:
 
-	# Ponudi unos drugom igracu
-	else:
-		kolona = int(input("Igracu 2, unesite vasu kolonu (0-6):"))
-		if da_li_je_popunjena_kolona(tabla,kolona):
-			red = get_sledeci_slobodan_red(tabla,kolona)
-			postavi_token(tabla,red,kolona,2)
+			#Ponudi unos prvom igracu
+			if turn == 0:
+				kolona = int(input("Igracu 1, unesite vasu kolonu (0-6):"))
 
-			if winning_move(tabla,2):
-				print("IGRAC 2 je POBEDNIK !!!")
-				game_over = True
+				if da_li_je_popunjena_kolona(tabla,kolona):
+					red = get_sledeci_slobodan_red(tabla,kolona)
+					postavi_token(tabla,red,kolona,1)
 
-	stampaj_tablu(tabla)
-	# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
-	turn += 1
-	turn = turn % 2
+					if winning_move(tabla,1):
+						print("IGRAC 1 je POBEDNIK !!!")
+						game_over = True
+
+			# Ponudi unos drugom igracu
+			else:
+				kolona = int(input("Igracu 2, unesite vasu kolonu (0-6):"))
+				if da_li_je_popunjena_kolona(tabla,kolona):
+					red = get_sledeci_slobodan_red(tabla,kolona)
+					postavi_token(tabla,red,kolona,2)
+
+					if winning_move(tabla,2):
+						print("IGRAC 2 je POBEDNIK !!!")
+						game_over = True
+
+			stampaj_tablu(tabla)
+			# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
+			turn += 1
+			turn = turn % 2
