@@ -27,6 +27,32 @@ def get_sledeci_slobodan_red(tabla,kolona):
 		if tabla[i][kolona] == 0:
 			return i
 
+#F-ja koja odredjuje da li je odigrani potez pobednicki
+def winning_move(tabla,token):
+	# proveri horizontalne lokacije
+	for c in range(BROJ_KOLONA-3):
+		for r in range(BROJ_REDOVA):
+			if tabla[r][c] == token and tabla[r][c+1] == token and tabla[r][c+2] == token and tabla[r][c+3] == token:
+				return True
+
+	# proveri vertikalne lokacije
+	for c in range(BROJ_KOLONA):
+		for r in range(BROJ_REDOVA-3):
+			if tabla[r][c] == token and tabla[r+1][c] == token and tabla[r+2][c] == token and tabla[r+3][c] == token:
+				return True
+
+	# proveri lokacije na glavnoj dijagonali 
+	for c in range(BROJ_KOLONA-3):
+		for r in range(BROJ_REDOVA-3):
+			if tabla[r][c] == token and tabla[r+1][c+1] == token and tabla[r+2][c+2] == token and tabla[r+3][c+3] == token:
+				return True
+
+	#proveri lokacije na sporednoj dijagonali
+	for c in range(BROJ_KOLONA-3):
+		for r in range(3, BROJ_REDOVA):
+			if tabla[r][c] == token and tabla[r-1][c+1] == token and tabla[r-2][c+2] == token and tabla[r-3][c+3] == token:
+				return True
+
 tabla = kreiraj_tablu()
 game_over = False
 turn = 0
@@ -39,12 +65,21 @@ while not game_over:
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			red = get_sledeci_slobodan_red(tabla,kolona)
 			postavi_token(tabla,red,kolona,1)
+
+			if winning_move(tabla,1):
+				print("IGRAC 1 je POBEDNIK !!!")
+				game_over = True
+
 	# Ponudi unos drugom igracu
 	else:
 		kolona = int(input("Igracu 2, unesite vasu kolonu (0-6):"))
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			red = get_sledeci_slobodan_red(tabla,kolona)
 			postavi_token(tabla,red,kolona,2)
+
+			if winning_move(tabla,2):
+				print("IGRAC 2 je POBEDNIK !!!")
+				game_over = True
 
 	stampaj_tablu(tabla)
 	# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
