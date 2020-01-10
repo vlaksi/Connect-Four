@@ -1,12 +1,16 @@
 import numpy as np 
 import pygame 
 import sys
+import math
+
 
 BROJ_REDOVA = 6
 BROJ_KOLONA = 6
 
 BELA = (255,255,255)
 SIVA = (200,200,200)
+CRNA = (0,0,0)
+ZUTA = (255,255,0)
 
 #F-ja koja kreira matricu 6 puta 6, koja predstavlja tablu
 def kreiraj_tablu():
@@ -64,6 +68,14 @@ def iscrtaj_tablu(tabla):
 			pygame.draw.rect(screen, BELA, (c*VELICINA_KVADRATA, r*VELICINA_KVADRATA+VELICINA_KVADRATA, VELICINA_KVADRATA, VELICINA_KVADRATA))
 			pygame.draw.circle(screen, SIVA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), int(r*VELICINA_KVADRATA+VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
 	
+	for c in range(BROJ_KOLONA):
+		for r in range(BROJ_REDOVA):		
+			if tabla[r][c] == 1:
+				pygame.draw.circle(screen, ZUTA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(r*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+			elif tabla[r][c] == 2:
+				pygame.draw.circle(screen, CRNA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(r*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+	pygame.display.update()
+
 tabla = kreiraj_tablu()
 game_over = False
 turn = 0
@@ -88,10 +100,10 @@ while not game_over:
 			sys.exit()
 
 		if event.type == pygame.MOUSEBUTTONDOWN:
-
-			#Ponudi unos prvom igracu
 			if turn == 0:
-				kolona = int(input("Igracu 1, unesite vasu kolonu (0-6):"))
+				# normalizujemo poziciju, tj kako bi na osnovu piksela 641,dobili da je to 6 kolona recimo.
+				posx = event.pos[0]
+				kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
 
 				if da_li_je_popunjena_kolona(tabla,kolona):
 					red = get_sledeci_slobodan_red(tabla,kolona)
@@ -101,9 +113,9 @@ while not game_over:
 						print("IGRAC 1 je POBEDNIK !!!")
 						game_over = True
 
-			# Ponudi unos drugom igracu
 			else:
-				kolona = int(input("Igracu 2, unesite vasu kolonu (0-6):"))
+				posx = event.pos[0]
+				kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
 				if da_li_je_popunjena_kolona(tabla,kolona):
 					red = get_sledeci_slobodan_red(tabla,kolona)
 					postavi_token(tabla,red,kolona,2)
@@ -113,6 +125,7 @@ while not game_over:
 						game_over = True
 
 			stampaj_tablu(tabla)
+			iscrtaj_tablu(tabla)
 			# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
 			turn += 1
 			turn = turn % 2
