@@ -92,6 +92,8 @@ screen = pygame.display.set_mode(size)
 iscrtaj_tablu(tabla)
 pygame.display.update()
 
+myfont = pygame.font.SysFont("monospace", 55)
+
 while not game_over:
 
 	# Prolazak kroz Event Lisenere od koristi i njihova implementacija
@@ -99,7 +101,18 @@ while not game_over:
 		if event.type == pygame.QUIT:
 			sys.exit()
 
+		if event.type == pygame.MOUSEMOTION:
+			pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
+			posx = event.pos[0]
+			if turn == 0:
+				pygame.draw.circle(screen, ZUTA, (posx, int(VELICINA_KVADRATA/2)), RADIUS)
+			elif turn == 1:
+				pygame.draw.circle(screen, CRNA, (posx, int(VELICINA_KVADRATA/2)), RADIUS)
+		pygame.display.update()
+
 		if event.type == pygame.MOUSEBUTTONDOWN:
+			pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
+
 			if turn == 0:
 				# normalizujemo poziciju, tj kako bi na osnovu piksela 641,dobili da je to 6 kolona recimo.
 				posx = event.pos[0]
@@ -110,7 +123,8 @@ while not game_over:
 					postavi_token(tabla,red,kolona,1)
 
 					if winning_move(tabla,1):
-						print("IGRAC 1 je POBEDNIK !!!")
+						label = myfont.render("POBEDA ZUTOG !!", 1, ZUTA)
+						screen.blit(label, (10,5))
 						game_over = True
 
 			else:
@@ -121,7 +135,8 @@ while not game_over:
 					postavi_token(tabla,red,kolona,2)
 
 					if winning_move(tabla,2):
-						print("IGRAC 2 je POBEDNIK !!!")
+						label = myfont.render("POBEDA CRNOG !!", 1, CRNA)
+						screen.blit(label, (10,5))
 						game_over = True
 
 			stampaj_tablu(tabla)
@@ -129,3 +144,7 @@ while not game_over:
 			# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
 			turn += 1
 			turn = turn % 2
+
+			# Iskljucivanje igre nakon game_overa-a
+			if game_over:
+				pygame.time.wait(3000)
