@@ -165,6 +165,48 @@ def izaberi_najbolji_potez(tabla, token):
 
 	return best_kolona
 
+def is_terminal_node(tabla):
+	return winning_move(tabla, PLAYER_TOKEN) or winning_move(tabla, AI_TOKEN) or len(get_validne_lokacije(tabla)) == 0
+
+def minimax(tabla, depth, maximizingPlayer):
+	validne_lokacije = get_validne_lokacije(tabla)
+	is_terminal = is_terminal_node(tabla)
+	if depth == 0 or is_terminal:
+		if is_terminal:
+			if winning_move(tabla, AI_TOKEN):
+				return (None, 100000000000000)
+			elif winning_move(tabla, PLAYER_TOKEN):
+				return (None, -10000000000000)
+			else: # Kraj igre, zato sto nema vise validnih poteza
+				return (None, 0)
+		else: # Depth is zero
+			return (None, score_position(tabla, AI_TOKEN))
+	if maximizingPlayer:
+		value = -math.inf
+		kolonaumn = random.choice(validne_lokacije)
+		for kolona in validne_lokacije:
+			red = get_sledeci_slobodan_red(tabla, kolona)
+			b_copy = tabla.copy()
+			postavi_token(b_copy, red, kolona, AI_TOKEN)
+			new_score = minimax(b_copy, depth-1, False)[1]
+			if new_score > value:
+				value = new_score
+				kolonaumn = kolona
+		return kolonaumn, value
+
+	else: # Minimizing player
+		value = math.inf
+		kolonaumn = random.choice(validne_lokacije)
+		for kolona in validne_lokacije:
+			red = get_sledeci_slobodan_red(tabla, kolona)
+			b_copy = tabla.copy()
+			postavi_token(b_copy, red, kolona, PLAYER_TOKEN)
+			new_score = minimax(b_copy, depth-1, True)[1]
+			if new_score < value:
+				value = new_score
+				kolonaumn = kolona
+		return kolonaumn, value
+
 tabla = kreiraj_tablu()
 game_over = False
 
@@ -224,10 +266,10 @@ while not game_over:
 
 	if turn == AI and not game_over:	
 		#kolona = random.randint(0,BROJ_KOLONA-1)
-		kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
-
+		#kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
+		# Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
+		kolona, minimax_score = minimax(tabla, 3, True)
 		if da_li_je_popunjena_kolona(tabla,kolona):
-			pygame.time.wait(700);
 			red = get_sledeci_slobodan_red(tabla,kolona)
 			postavi_token(tabla,red,kolona,AI_TOKEN)
 
