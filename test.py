@@ -99,7 +99,7 @@ def proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token):
 		score += 2
 
 	if povrsina_za_pobedu.count(protivnicki_token) == 3 and povrsina_za_pobedu.count(PRAZNO_POLJE) == 1:
-		score -= 4
+		score -= 40
 
 	return score
 
@@ -107,11 +107,34 @@ def proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token):
 def score_position(tabla, token):
 	score = 0
 
+	## Boduj centralnu kolonu
+	center_array = [int(i) for i in list(tabla[:, BROJ_KOLONA//2])]
+	centaralni_brojac = center_array.count(token)
+	score += centaralni_brojac * 3
+
 	## Boduj horizontalno
 	for r in range(BROJ_REDOVA):
 		red_array = [int(i) for i in list(tabla[r,:])]
 		for c in range(BROJ_KOLONA-3):
 			povrsina_za_pobedu = red_array[c:c+POVRSINA_ZA_POBEDU]
+			score += proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token)
+
+	## Boduj vertikalno u pozitivno smeru(na gore)
+	for c in range(BROJ_KOLONA):
+		kolona_array = [int(i) for i in list(tabla[:,c])]
+		for r in range(BROJ_REDOVA-3):
+			povrsina_za_pobedu = kolona_array[r:r+POVRSINA_ZA_POBEDU]
+			score += proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token)
+
+	## Boduj vertiaklno u negativnom smeru(na dole)
+	for r in range(BROJ_REDOVA-3):
+		for c in range(BROJ_KOLONA-3):
+			povrsina_za_pobedu = [tabla[r+i][c+i] for i in range(POVRSINA_ZA_POBEDU)]
+			score += proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token)
+
+	for r in range(BROJ_REDOVA-3):
+		for c in range(BROJ_KOLONA-3):
+			povrsina_za_pobedu = [tabla[r+3-i][c+i] for i in range(POVRSINA_ZA_POBEDU)]
 			score += proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token)
 
 	return score
@@ -202,7 +225,7 @@ while not game_over:
 	if turn == AI and not game_over:	
 		#kolona = random.randint(0,BROJ_KOLONA-1)
 		kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
-		
+
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			pygame.time.wait(700);
 			red = get_sledeci_slobodan_red(tabla,kolona)
