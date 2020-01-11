@@ -116,6 +116,31 @@ def score_position(tabla, token):
 
 	return score
 
+#F-ja koja trazi sve validne(prazne) lokacije i smesta ih u niz,
+# npr ako ako ni jedna kolona nije popunjena niz izgleda valid_location = [0,1,2,3,4,5]
+def get_validne_lokacije(tabla):
+	validne_lokacije = []
+	for kolona in range(BROJ_KOLONA):
+		if da_li_je_popunjena_kolona(tabla, kolona):
+			validne_lokacije.append(kolona)
+	return validne_lokacije
+
+# F-ja koja vraca najpogodniju kolonu za odigrati potez
+def izaberi_najbolji_potez(tabla, token):
+
+	validne_lokacije = get_validne_lokacije(tabla)
+	best_score = -10000
+	best_kolona = random.choice(validne_lokacije)
+	for kolona in validne_lokacije:
+		red = get_sledeci_slobodan_red(tabla, kolona)
+		temp_tabla = tabla.copy()
+		postavi_token(temp_tabla, red, kolona, token)
+		score = score_position(temp_tabla, token)
+		if score > best_score:
+			best_score = score
+			best_kolona = kolona
+
+	return best_kolona
 
 tabla = kreiraj_tablu()
 game_over = False
@@ -175,8 +200,9 @@ while not game_over:
 					turn = turn % 2
 
 	if turn == AI and not game_over:	
-		kolona = random.randint(0,BROJ_KOLONA-1)
-
+		#kolona = random.randint(0,BROJ_KOLONA-1)
+		kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
+		
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			pygame.time.wait(700);
 			red = get_sledeci_slobodan_red(tabla,kolona)
