@@ -2,7 +2,10 @@ import numpy as np
 import pygame 
 import sys
 import math
+import random
 
+PLAYER = 0
+AI = 1
 
 BROJ_REDOVA = 6
 BROJ_KOLONA = 6
@@ -78,7 +81,6 @@ def iscrtaj_tablu(tabla):
 
 tabla = kreiraj_tablu()
 game_over = False
-turn = 0
 
 # Konfigurisanje GUI-a
 pygame.init()
@@ -94,6 +96,8 @@ pygame.display.update()
 
 myfont = pygame.font.SysFont("monospace", 55)
 
+turn = random.randint(PLAYER, AI)
+
 while not game_over:
 
 	# Prolazak kroz Event Lisenere od koristi i njihova implementacija
@@ -104,16 +108,15 @@ while not game_over:
 		if event.type == pygame.MOUSEMOTION:
 			pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
 			posx = event.pos[0]
-			if turn == 0:
+			if turn == PLAYER:
 				pygame.draw.circle(screen, ZUTA, (posx, int(VELICINA_KVADRATA/2)), RADIUS)
-			elif turn == 1:
-				pygame.draw.circle(screen, CRNA, (posx, int(VELICINA_KVADRATA/2)), RADIUS)
+			
 		pygame.display.update()
 
 		if event.type == pygame.MOUSEBUTTONDOWN:
 			pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
 
-			if turn == 0:
+			if turn == PLAYER:
 				# normalizujemo poziciju, tj kako bi na osnovu piksela 641,dobili da je to 6 kolona recimo.
 				posx = event.pos[0]
 				kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
@@ -127,24 +130,31 @@ while not game_over:
 						screen.blit(label, (10,5))
 						game_over = True
 
-			else:
-				posx = event.pos[0]
-				kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
-				if da_li_je_popunjena_kolona(tabla,kolona):
-					red = get_sledeci_slobodan_red(tabla,kolona)
-					postavi_token(tabla,red,kolona,2)
+					stampaj_tablu(tabla)
+					iscrtaj_tablu(tabla)
+					# prelazak na sledeceg igraca
+					turn += 1
+					turn = turn % 2
 
-					if winning_move(tabla,2):
-						label = myfont.render("POBEDA CRNOG !!", 1, CRNA)
-						screen.blit(label, (10,5))
-						game_over = True
+	if turn == AI and not game_over:	
+		kolona = random.randint(0,BROJ_KOLONA-1)
+
+		if da_li_je_popunjena_kolona(tabla,kolona):
+			pygame.time.wait(700);
+			red = get_sledeci_slobodan_red(tabla,kolona)
+			postavi_token(tabla,red,kolona,2)
+
+			if winning_move(tabla,2):
+				label = myfont.render("POBEDA CRNOG !!", 1, CRNA)
+				screen.blit(label, (10,5))
+				game_over = True
 
 			stampaj_tablu(tabla)
 			iscrtaj_tablu(tabla)
-			# prelazak na sledeceg igraca, matematicki da uvek bude izmedju 0-1
+			# prelazak na sledeceg igraca
 			turn += 1
 			turn = turn % 2
 
-			# Iskljucivanje igre nakon game_overa-a
-			if game_over:
-				pygame.time.wait(3000)
+	# Iskljucivanje igre nakon game_overa-a
+	if game_over:
+		pygame.time.wait(3000)
