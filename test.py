@@ -168,7 +168,7 @@ def izaberi_najbolji_potez(tabla, token):
 def is_terminal_node(tabla):
 	return winning_move(tabla, PLAYER_TOKEN) or winning_move(tabla, AI_TOKEN) or len(get_validne_lokacije(tabla)) == 0
 
-def minimax(tabla, depth, maximizingPlayer):
+def minimax(tabla, depth, alpha, beta, maximizingPlayer):
 	validne_lokacije = get_validne_lokacije(tabla)
 	is_terminal = is_terminal_node(tabla)
 	if depth == 0 or is_terminal:
@@ -188,10 +188,14 @@ def minimax(tabla, depth, maximizingPlayer):
 			red = get_sledeci_slobodan_red(tabla, kolona)
 			b_copy = tabla.copy()
 			postavi_token(b_copy, red, kolona, AI_TOKEN)
-			new_score = minimax(b_copy, depth-1, False)[1]
+			new_score = minimax(b_copy, depth-1, alpha, beta, False)[1]
 			if new_score > value:
 				value = new_score
 				kolonaumn = kolona
+			alpha = max(alpha, value)
+			if alpha >= beta:
+				break
+
 		return kolonaumn, value
 
 	else: # Minimizing player
@@ -201,10 +205,14 @@ def minimax(tabla, depth, maximizingPlayer):
 			red = get_sledeci_slobodan_red(tabla, kolona)
 			b_copy = tabla.copy()
 			postavi_token(b_copy, red, kolona, PLAYER_TOKEN)
-			new_score = minimax(b_copy, depth-1, True)[1]
+			new_score = minimax(b_copy, depth-1, alpha, beta, True)[1]
 			if new_score < value:
 				value = new_score
 				kolonaumn = kolona
+			beta = min(beta, value)
+			if alpha >= beta:
+				break
+
 		return kolonaumn, value
 
 tabla = kreiraj_tablu()
@@ -268,7 +276,7 @@ while not game_over:
 		#kolona = random.randint(0,BROJ_KOLONA-1)
 		#kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
 		# Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
-		kolona, minimax_score = minimax(tabla, 3, True)
+		kolona, minimax_score = minimax(tabla, 3, -math.inf, math.inf, True)
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			red = get_sledeci_slobodan_red(tabla,kolona)
 			postavi_token(tabla,red,kolona,AI_TOKEN)
