@@ -6,9 +6,13 @@ import random
 
 PLAYER = 0
 AI = 1
+PRAZNO_POLJE = 0
+PLAYER_TOKEN = 1
+AI_TOKEN = 2
 
 BROJ_REDOVA = 6
 BROJ_KOLONA = 6
+POVRSINA_ZA_POBEDU = 4
 
 BELA = (255,255,255)
 SIVA = (200,200,200)
@@ -73,11 +77,45 @@ def iscrtaj_tablu(tabla):
 	
 	for c in range(BROJ_KOLONA):
 		for r in range(BROJ_REDOVA):		
-			if tabla[r][c] == 1:
+			if tabla[r][c] == PLAYER_TOKEN:
 				pygame.draw.circle(screen, ZUTA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(r*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
-			elif tabla[r][c] == 2:
+			elif tabla[r][c] == AI_TOKEN:
 				pygame.draw.circle(screen, CRNA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(r*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
 	pygame.display.update()
+
+
+#F-ja koja daje bodove celijama nase tabele
+def proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token):
+	score = 0
+	protivnicki_token = PLAYER_TOKEN
+	if token == PLAYER_TOKEN:
+		protivnicki_token = AI_TOKEN
+
+	if povrsina_za_pobedu.count(token) == 4:
+		score += 100
+	elif povrsina_za_pobedu.count(token) == 3 and povrsina_za_pobedu.count(PRAZNO_POLJE) == 1:
+		score += 5
+	elif povrsina_za_pobedu.count(token) == 2 and povrsina_za_pobedu.count(PRAZNO_POLJE) == 2:
+		score += 2
+
+	if povrsina_za_pobedu.count(protivnicki_token) == 3 and povrsina_za_pobedu.count(PRAZNO_POLJE) == 1:
+		score -= 4
+
+	return score
+
+#F-ja koja vrsi bodovanje 
+def score_position(tabla, token):
+	score = 0
+
+	## Boduj horizontalno
+	for r in range(BROJ_REDOVA):
+		red_array = [int(i) for i in list(tabla[r,:])]
+		for c in range(BROJ_KOLONA-3):
+			povrsina_za_pobedu = red_array[c:c+POVRSINA_ZA_POBEDU]
+			score += proceni_povrsinu_za_pobedu(povrsina_za_pobedu, token)
+
+	return score
+
 
 tabla = kreiraj_tablu()
 game_over = False
@@ -123,9 +161,9 @@ while not game_over:
 
 				if da_li_je_popunjena_kolona(tabla,kolona):
 					red = get_sledeci_slobodan_red(tabla,kolona)
-					postavi_token(tabla,red,kolona,1)
+					postavi_token(tabla,red,kolona,PLAYER_TOKEN)
 
-					if winning_move(tabla,1):
+					if winning_move(tabla,PLAYER_TOKEN):
 						label = myfont.render("POBEDA ZUTOG !!", 1, ZUTA)
 						screen.blit(label, (10,5))
 						game_over = True
@@ -142,9 +180,9 @@ while not game_over:
 		if da_li_je_popunjena_kolona(tabla,kolona):
 			pygame.time.wait(700);
 			red = get_sledeci_slobodan_red(tabla,kolona)
-			postavi_token(tabla,red,kolona,2)
+			postavi_token(tabla,red,kolona,AI_TOKEN)
 
-			if winning_move(tabla,2):
+			if winning_move(tabla,AI_TOKEN):
 				label = myfont.render("POBEDA CRNOG !!", 1, CRNA)
 				screen.blit(label, (10,5))
 				game_over = True
