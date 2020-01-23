@@ -4,6 +4,9 @@ import sys
 import math
 import random
 import ctypes
+import xlwt
+from datetime import datetime
+
 
 PLAYER = 0
 AI = 1
@@ -359,3 +362,24 @@ while not game_over:
 	# Iskljucivanje igre nakon game_overa-a
 	if game_over:
 		pygame.time.wait(3000)
+		style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
+	    num_format_str='#,##0.00')
+		style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
+
+		wb = xlwt.Workbook()
+		ws = wb.add_sheet('A Test Sheett')
+
+		for i in range(len(nizPoteza)):
+			ws.write(i, 0, i+1, style0)
+			ws.write(i, 1, nizPoteza[i], style0)
+
+
+		# ws.write(0, 0, 1234.56, style0)
+		#prvi parametar red u koji upisujemo
+		#drugi parametar kolona u koju upisujemo
+		# ws.write(1, 0, datetime.now(), style1)
+		# ws.write(2, 0, 1)
+		# ws.write(2, 1, 1)
+		# ws.write(2, 2, xlwt.Formula("A3+B3"))
+
+		wb.save('dataSet.xls')
