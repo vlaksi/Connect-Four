@@ -15,6 +15,7 @@ from sklearn.datasets import load_boston
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
+import ctypes
 
 
 PLAYER = 0
@@ -38,6 +39,7 @@ green = (0,200,0)
 bright_red = (255,0,0)
 bright_green = (0,255,0)
 
+pom_y = []
 #F-ja koja kreira matricu 6 puta 6, koja predstavlja tablu
 def kreiraj_tablu():
     tabla = np.zeros((BROJ_REDOVA,BROJ_KOLONA))
@@ -266,7 +268,16 @@ def ridge_regression(data, predictors, alpha):
     ridgereg.fit(data[predictors],data['y'])
     y_pred = ridgereg.predict(data[predictors])
     print("Predikcija poteza", y_pred)
+    print("PREDIKCIJA ZA PRVI POTEZ", y_pred[1])
+   
+    for p in y_pred:
+        if p not in pom_y:
+            pom_y.append(p)
     
+    for x in range(len(pom_y)):
+        print("Predikcija za potez ", x+1 , round(abs(pom_y[x])))
+
+
     #Return the result in pre-defined format
     rss = sum((y_pred-data['y'])**2)
     ret = [rss]
@@ -350,6 +361,10 @@ fontZaButtn = pygame.font.SysFont("monospace", 20)
 
 turn = random.randint(PLAYER, AI)
 
+indikator = -1
+if turn == PLAYER:
+    indikator = 1
+
 # Inijalizacija dinamickog niza
 nizPoteza = DynamicArray() 
 
@@ -362,12 +377,12 @@ with open('trainingSet.csv', 'r') as csvfile:
     citac = csv.reader(csvfile, delimiter='\t')
     next(citac)
     for entitet in citac:
-        x.append(entitet[0])
-        y.append(entitet[1])
+        x.append(int(entitet[0]))
+        y.append(int(entitet[1]))
 
 # Ispisivanje ucitanih lista
-# print(x)
-# print(y)
+print(x)
+print(y)
 while not game_over:
 
     # Prolazak kroz Event Lisenere od koristi i njihova implementacija
@@ -401,14 +416,11 @@ while not game_over:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
 
             if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:     
-                label1 = fontZaButtn.render("Pomoc", 1, CRNA)
-                label2 = fontZaButtn.render("numerike", 1, CRNA)
-                screen.blit(label1, (348,750)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
-                screen.blit(label2, (333,770)) 
+
                 #Define input array with angles from 60deg to 300deg converted to radians
-                x = [1, 1,2 ,2,3,3,3,4,4,4,5,5,6,6,7,7,7,7,8,8,8,8,9,9,9,10,10,10,10,11,11,11,11,12,12,12,12,13,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36]
+                #x = [1, 1,2 ,2,3,3,3,4,4,4,5,5,6,6,7,7,7,7,8,8,8,8,9,9,9,10,10,10,10,11,11,11,11,12,12,12,12,13,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36]
                 np.random.seed(10)  #Setting seed for reproducability
-                y = 4.5 + np.random.normal(0,1,len(x))
+                #y = 4.5 + np.random.normal(0,1,len(x))
                 data = pd.DataFrame(np.column_stack([x,y]),columns=['x','y'])
                 for i in range(2,16):  #power of 1 is already there
                     colname = 'x_%d'%i      #new var will be x_power
@@ -420,16 +432,22 @@ while not game_over:
 
                 #Set the different values of alpha to be tested
                 #alpha_ridge = [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]
-                alpha_ridge = [1e-15]
+                alpha_ridge = [1e-4]
 
                 #Initialize the dataframe for storing coefficients.
                 col = ['rss','intercept'] + ['coef_x_%d'%i for i in range(1,16)]
                 ind = ['alpha_%.2g'%alpha_ridge[0]]
                 coef_matrix_ridge = pd.DataFrame(index=ind, columns=col)
 
-                models_to_plot = {1e-15:231}  
+                models_to_plot = {1e-4:233}  
         
                 coef_matrix_ridge.iloc[0,] = ridge_regression(data, predictors, alpha_ridge[0])
+
+                if indikator==-1:
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)) + " odigraj " + str(int(round(pom_y[len(nizPoteza)]))), "Predlog poteza", 1)
+                else:
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)+1) + " odigraj " + str(int(round(pom_y[len(nizPoteza)+1]))), "Predlog poteza", 1)
+                
             
             if turn == PLAYER:
 
