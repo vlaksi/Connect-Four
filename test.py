@@ -21,6 +21,7 @@ POVRSINA_ZA_POBEDU = 4
 
 BELA = (255,255,255)
 SIVA = (200,200,200)
+TAMNO_SIVA = (117, 117, 117)
 CRNA = (0,0,0)
 ZUTA = (255,255,0)
 red = (200,0,0)
@@ -307,6 +308,7 @@ iscrtaj_tablu(tabla)
 pygame.display.update()
 
 myfont = pygame.font.SysFont("monospace", 55)
+fontZaButtn = pygame.font.SysFont("monospace", 20)
 
 turn = random.randint(PLAYER, AI)
 
@@ -328,12 +330,17 @@ while not game_over:
                 
             mouse = pygame.mouse.get_pos()
             #print(mouse)
-                
             if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:
-                pygame.draw.rect(screen, bright_green,(300,650,160,50))
+                pygame.draw.rect(screen, TAMNO_SIVA,(300,650,160,50))
             else:
-                pygame.draw.rect(screen, green,(300,650,160,50))
-            pygame.draw.rect(screen, red,(550,450,100,50))    
+                pygame.draw.rect(screen, SIVA,(300,650,160,50))    
+
+            label1 = fontZaButtn.render("Pomoc", 1, CRNA)
+            label2 = fontZaButtn.render("numerike", 1, CRNA)
+            screen.blit(label1, (348,655)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
+            screen.blit(label2, (333,675))
+        
+          
             
         pygame.display.update()
 
@@ -341,24 +348,26 @@ while not game_over:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
 
             if turn == PLAYER:
-                # normalizujemo poziciju, tj kako bi na osnovu piksela 641,dobili da je to 6 kolona recimo.
-                posx = event.pos[0]
-                kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
 
-                if da_li_je_popunjena_kolona(tabla,kolona):
-                    red = get_sledeci_slobodan_red(tabla,kolona)
-                    postavi_token(tabla,red,kolona,PLAYER_TOKEN)
+                if mouse[1] < 620:
+                    # normalizujemo poziciju, tj kako bi na osnovu piksela 641,dobili da je to 6 kolona recimo.
+                    posx = event.pos[0]
+                    kolona = int(math.floor(posx/VELICINA_KVADRATA)) 
 
-                    if winning_move(tabla,PLAYER_TOKEN):
-                        label = myfont.render("POBEDA ZUTOG !!", 1, ZUTA)
-                        screen.blit(label, (10,5))
-                        game_over = True
+                    if da_li_je_popunjena_kolona(tabla,kolona):
+                        red = get_sledeci_slobodan_red(tabla,kolona)
+                        postavi_token(tabla,red,kolona,PLAYER_TOKEN)
 
-                    stampaj_tablu(tabla)
-                    iscrtaj_tablu(tabla)
-                    # prelazak na sledeceg igraca
-                    turn += 1
-                    turn = turn % 2
+                        if winning_move(tabla,PLAYER_TOKEN):
+                            label = myfont.render("POBEDA ZUTOG !!", 1, ZUTA)
+                            screen.blit(label, (10,5))
+                            game_over = True
+
+                        stampaj_tablu(tabla)
+                        iscrtaj_tablu(tabla)
+                        # prelazak na sledeceg igraca
+                        turn += 1
+                        turn = turn % 2
 
     if turn == AI and not game_over:    
         #kolona = random.randint(0,BROJ_KOLONA-1)
