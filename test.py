@@ -7,6 +7,15 @@ import ctypes
 import xlwt
 from datetime import datetime
 import imageio
+import matplotlib.pyplot as plt
+import pandas as pd
+import matplotlib
+matplotlib.rcParams.update({'font.size': 12})
+from sklearn.datasets import load_boston
+#from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import Ridge
 
 
 PLAYER = 0
@@ -236,6 +245,42 @@ def minimax(tabla, depth, alpha, beta, maximizingPlayer):
 
         return kolonaumn, value
 
+def lasso_regression(data, predictors, alpha, models_to_plot={}):
+    #Fit the model
+    lassoreg = Lasso(alpha=alpha,normalize=True, max_iter=1e5)
+    lassoreg.fit(data[predictors],data['y'])
+    y_pred = lassoreg.predict(data[predictors])
+    
+    #Check if a plot is to be made for the entered alpha
+    if alpha in models_to_plot:
+        plt.subplot(models_to_plot[alpha])
+        plt.tight_layout()
+        plt.plot(data['x'],y_pred)
+        plt.plot(data['x'],data['y'],'.')
+        plt.title('Plot for alpha: %.3g'%alpha)
+    
+    #Return the result in pre-defined format
+    rss = sum((y_pred-data['y'])**2)
+    ret = [rss]
+    ret.extend([lassoreg.intercept_])
+    ret.extend(lassoreg.coef_)
+    return ret
+
+def ridge_regression(data, predictors, alpha):
+
+    #Fit the model
+    ridgereg = Ridge(alpha=alpha,normalize=True)
+    ridgereg.fit(data[predictors],data['y'])
+    y_pred = ridgereg.predict(data[predictors])
+    print("Predikcija poteza", y_pred)
+    
+    #Return the result in pre-defined format
+    rss = sum((y_pred-data['y'])**2)
+    ret = [rss]
+    ret.extend([ridgereg.intercept_])
+    ret.extend(ridgereg.coef_)
+    return ret
+
 class DynamicArray(object): 
     ''' 
     DYNAMIC ARRAY CLASS (Similar to Python List) 
@@ -347,6 +392,37 @@ while not game_over:
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
 
+            if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:     
+                label1 = fontZaButtn.render("Pomoc", 1, CRNA)
+                label2 = fontZaButtn.render("numerike", 1, CRNA)
+                screen.blit(label1, (348,750)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
+                screen.blit(label2, (333,770)) 
+                #Define input array with angles from 60deg to 300deg converted to radians
+                x = [1, 1,2 ,2,3,3,3,4,4,4,5,5,6,6,7,7,7,7,8,8,8,8,9,9,9,10,10,10,10,11,11,11,11,12,12,12,12,13,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,31,32,33,34,35,36]
+                np.random.seed(10)  #Setting seed for reproducability
+                y = 4.5 + np.random.normal(0,1,len(x))
+                data = pd.DataFrame(np.column_stack([x,y]),columns=['x','y'])
+                for i in range(2,16):  #power of 1 is already there
+                    colname = 'x_%d'%i      #new var will be x_power
+                    data[colname] = data['x']**i
+
+                #Initialize predictors to be set of 15 powers of x
+                predictors=['x']
+                predictors.extend(['x_%d'%i for i in range(2,16)])
+
+                #Set the different values of alpha to be tested
+                #alpha_ridge = [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]
+                alpha_ridge = [1e-15]
+
+                #Initialize the dataframe for storing coefficients.
+                col = ['rss','intercept'] + ['coef_x_%d'%i for i in range(1,16)]
+                ind = ['alpha_%.2g'%alpha_ridge[0]]
+                coef_matrix_ridge = pd.DataFrame(index=ind, columns=col)
+
+                models_to_plot = {1e-15:231}  
+        
+                coef_matrix_ridge.iloc[0,] = ridge_regression(data, predictors, alpha_ridge[0])
+            
             if turn == PLAYER:
 
                 if mouse[1] < 620:
