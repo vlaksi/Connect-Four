@@ -250,14 +250,8 @@ def lasso_regression(data, predictors, alpha, models_to_plot={}):
     lassoreg = Lasso(alpha=alpha,normalize=True, max_iter=1e5)
     lassoreg.fit(data[predictors],data['y'])
     y_pred = lassoreg.predict(data[predictors])
-    
-    #Check if a plot is to be made for the entered alpha
-    if alpha in models_to_plot:
-        plt.subplot(models_to_plot[alpha])
-        plt.tight_layout()
-        plt.plot(data['x'],y_pred)
-        plt.plot(data['x'],data['y'],'.')
-        plt.title('Plot for alpha: %.3g'%alpha)
+    print("Predikcija poteza", y_pred)
+  
     
     #Return the result in pre-defined format
     rss = sum((y_pred-data['y'])**2)
