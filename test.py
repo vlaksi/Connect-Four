@@ -4,10 +4,8 @@ import sys
 import math
 import random
 import ctypes
-import xlwt
-from datetime import datetime
 import imageio
-
+import csv
 
 PLAYER = 0
 AI = 1
@@ -315,6 +313,21 @@ turn = random.randint(PLAYER, AI)
 # Inijalizacija dinamickog niza
 nizPoteza = DynamicArray() 
 
+# Dve liste koje sluze iscitavanje trainingSet kako bi vrsil numericke proracune nad njima
+x = []
+y = []
+
+# Iscitavanje iz fajla i smestanje u liste x i y
+with open('trainingSet.csv', 'r') as csvfile:
+    citac = csv.reader(csvfile, delimiter='\t')
+    next(citac)
+    for entitet in citac:
+        x.append(entitet[0])
+        y.append(entitet[1])
+
+# Ispisivanje ucitanih lista
+# print(x)
+# print(y)
 while not game_over:
 
     # Prolazak kroz Event Lisenere od koristi i njihova implementacija
@@ -374,15 +387,27 @@ while not game_over:
         #kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
         # Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
         kolona, minimax_score = minimax(tabla, 3, -math.inf, math.inf, True)
+
         if da_li_je_popunjena_kolona(tabla,kolona):
             red = get_sledeci_slobodan_red(tabla,kolona)
             postavi_token(tabla,red,kolona,AI_TOKEN)
-    
+        
+            # Promenljive koje su nam potrebne za cuvanje u traningSetu
+            brojPoteza=0
+            brojKolone=0
             # Appendovanje novog elemnta, tj kolone koja je odigrana  
             nizPoteza.append(kolona) 
             for i in range(len(nizPoteza)):
-                print("Broj poteza" ,i+1, " AI je odigrao polje ", nizPoteza[i] )
-            
+                print("Broj poteza" ,i+1, " AI je odigrao na kolonu ", nizPoteza[i] )
+                brojPoteza=i
+                brojKolone=nizPoteza[i]
+
+            # Prikupljanje podataka prilikom treniranja igre.
+            with open('trainingSet.csv', 'a', newline='') as csvfile:
+                imenaPolja = ['brojPoteza', 'brojKolone']
+                writer = csv.DictWriter(csvfile, fieldnames=imenaPolja, delimiter='\t')
+                writer.writerow({'brojPoteza': brojPoteza+1, 'brojKolone': brojKolone})
+
             if winning_move(tabla,AI_TOKEN):
                 label = myfont.render("POBEDA CRNOG !!", 1, CRNA)
                 screen.blit(label, (10,5))
@@ -397,24 +422,17 @@ while not game_over:
     # Iskljucivanje igre nakon game_overa-a
     if game_over:
         pygame.time.wait(3000)
-        style0 = xlwt.easyxf('font: name Times New Roman, color-index red, bold on',
-        num_format_str='#,##0.00')
-        style1 = xlwt.easyxf(num_format_str='D-MMM-YY')
 
-        wb = xlwt.Workbook()
-        ws = wb.add_sheet('A Test Sheett')
+        # Ako zelimo da resetujemo nas trainingSet, zakomentarisemo deo gde se podaci pune
+        # i otkomentarisemo ovo kako bi napravili prazan fajl ( odnosno resetovali traningSet)
+        # NIJE PREPORUCLJIBO OVO RADITI !!!
 
-        for i in range(len(nizPoteza)):
-            ws.write(i, 0, i+1, style0)
-            ws.write(i, 1, nizPoteza[i], style0)
+        # with open('trainingSet.csv', 'w', newline='') as csvfile:
+        #    imenaPolja = ['brojPoteza', 'brojKolone']
+        #    writer = csv.DictWriter(csvfile, fieldnames=imenaPolja, delimiter='\t')
+
+        #    writer.writeheader()
 
 
-        # ws.write(0, 0, 1234.56, style0)
-        #prvi parametar red u koji upisujemo
-        #drugi parametar kolona u koju upisujemo
-        # ws.write(1, 0, datetime.now(), style1)
-        # ws.write(2, 0, 1)
-        # ws.write(2, 1, 1)
-        # ws.write(2, 2, xlwt.Formula("A3+B3"))
-
-        wb.save('dataSet.xls')
+        
+            
