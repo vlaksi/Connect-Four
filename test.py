@@ -386,7 +386,7 @@ while not game_over:
         #kolona = random.randint(0,BROJ_KOLONA-1)
         #kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
         # Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
-        kolona, minimax_score = minimax(tabla, 3, -math.inf, math.inf, True)
+        kolona, minimax_score = minimax(tabla, 4, -math.inf, math.inf, True)
 
         if da_li_je_popunjena_kolona(tabla,kolona):
             red = get_sledeci_slobodan_red(tabla,kolona)
