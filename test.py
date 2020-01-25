@@ -16,7 +16,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 import ctypes
-
+import tkinter as tk
+from tk_html_widgets import HTMLLabel
 
 PLAYER = 0
 AI = 1
@@ -403,10 +404,21 @@ while not game_over:
             else:
                 pygame.draw.rect(screen, SIVA,(300,650,160,50))    
 
+             #print(mouse)
+            if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
+                pygame.draw.rect(screen, TAMNO_SIVA,(300,725,160,50))
+            else:
+                pygame.draw.rect(screen, SIVA,(300,725,160,50))    
+
             label1 = fontZaButtn.render("Pomoc", 1, CRNA)
             label2 = fontZaButtn.render("numerike", 1, CRNA)
             screen.blit(label1, (348,655)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
             screen.blit(label2, (333,675))
+
+            label3 = fontZaButtn.render("Princip", 1, CRNA)
+            label4 = fontZaButtn.render("numerike", 1, CRNA)
+            screen.blit(label3, (338,730)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
+            screen.blit(label4, (333,750))
         
           
             
@@ -414,6 +426,18 @@ while not game_over:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
+
+            if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
+                root = tk.Tk()
+                root.title("O aplikaciji")
+
+                html_label = HTMLLabel(root, html='<h1 style="color: green; text-align: center"> Ubaciti tekst neki </h1>')
+                html_label.pack(fill="both", expand=True)
+                html_label.fit_height()
+                root.mainloop()
+
+
+
 
             if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:     
 
