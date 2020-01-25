@@ -587,18 +587,14 @@ while not game_over:
                 #     plt.clf()
 
 
-
-
             if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
                 root = tk.Tk()
-                root.title("O aplikaciji")
+                root.title("Ispod haube")
 
-                html_label = HTMLLabel(root, html='<h1 style="color: green; text-align: center"> Ubaciti tekst neki </h1>')
+                html_label = HTMLLabel(root, html='<html><div><h1> ----------------- Princip numerike ----------------- </h1> <h4>Princip na kome radi numerika je zasnovan na regresiji i regulaciji. Metode koje koristimo su: Ridge i Lasso metoda takozvane L1 i L2 metode.<br><br>Nas program se samostalno trenira tokom kontinuiranog igranja, odnosno sto vise budemo igrali igru, dobijacemo bolje predikcije tj. savete koja kolona je najbolja da se odigra u sledecem potezu na osnovu naseg predjasnjeg iskustva u igranju protiv AI-a.<br> <br> Voditi racuna da MOD 2 nije optimalan na pocetku vaseg igranja, sto znaci da ce on tek postati kompetentan sa sve vecim vasim igranjem igre, zato sto se zasniva na podacima koje prikuplja od vaseg igranja protiv AI-a.<img src="podaci.png"  width="600" height="350"><br><br>Kada nismo sigurni gde je najpametnije odigrati sledeci potez, nasa numerika ce tada izvrsiti regresiju i regulaciju i reci nam koji potez je optimalan.</h6> <h1> ---------------------- Metode ---------------------- </h1> <p> Metode koje uvode kaznenu funkciju tj. izraz zvan penal, a time koriguju izgled nase krive koja nam saopstava naredni potez su Lasso, Ridge metode. </p><img src="Lm.png" width="600" height="100">  </div></html>')
                 html_label.pack(fill="both", expand=True)
                 html_label.fit_height()
                 root.mainloop()
-
-
 
 
             if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:     
