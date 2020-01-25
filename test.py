@@ -18,12 +18,13 @@ from sklearn.linear_model import Ridge
 import ctypes
 import easygui
 import random
+import tkinter as tk
+from tk_html_widgets import HTMLLabel
 
 while (1):
     gameMode = easygui.enterbox("Unesite 1 ili 2 (mod 1 je mod u kom AI igra po MINMAX algoritmu, mod 2 je mod u kom AI igra po predikciji numerike na osnovu istreniranog dataseta  ")
-    if(int(gameMode) == 1 or int(gameMode) ==2):
+    if(gameMode == '1' or gameMode == '2'):
         break
-
 
 PLAYER = 0
 AI = 1
@@ -410,10 +411,21 @@ while not game_over:
             else:
                 pygame.draw.rect(screen, SIVA,(300,650,160,50))    
 
+             #print(mouse)
+            if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
+                pygame.draw.rect(screen, TAMNO_SIVA,(300,725,160,50))
+            else:
+                pygame.draw.rect(screen, SIVA,(300,725,160,50))    
+
             label1 = fontZaButtn.render("Pomoc", 1, CRNA)
             label2 = fontZaButtn.render("numerike", 1, CRNA)
             screen.blit(label1, (348,655)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
             screen.blit(label2, (333,675))
+
+            label3 = fontZaButtn.render("Princip", 1, CRNA)
+            label4 = fontZaButtn.render("numerike", 1, CRNA)
+            screen.blit(label3, (338,730)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
+            screen.blit(label4, (333,750))
         
           
             
@@ -421,6 +433,18 @@ while not game_over:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
+
+            if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
+                root = tk.Tk()
+                root.title("O aplikaciji")
+
+                html_label = HTMLLabel(root, html='<h1 style="color: green; text-align: center"> Ubaciti tekst neki </h1>')
+                html_label.pack(fill="both", expand=True)
+                html_label.fit_height()
+                root.mainloop()
+
+
+
 
             if 300+100 > mouse[0] > 300 and 650+50 > mouse[1] > 650:     
 
@@ -468,7 +492,7 @@ while not game_over:
                         postavi_token(tabla,red,kolona,PLAYER_TOKEN)
 
                         if winning_move(tabla,PLAYER_TOKEN):
-                            label = myfont.render("POBEDA ZUTOG !!", 1, ZUTA)
+                            label = myfont.render("POBEDA ZUTOG !!", 1, CRNA)
                             screen.blit(label, (10,5))
                             game_over = True
 
@@ -482,7 +506,7 @@ while not game_over:
         #kolona = random.randint(0,BROJ_KOLONA-1)
         #kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
         # Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
-        if(int(gameMode) == 1):
+        if(gameMode == '1'):
             kolona, minimax_score = minimax(tabla, 4, -math.inf, math.inf, True)
         else: 
             data = pd.DataFrame(np.column_stack([x,y]),columns=['x','y'])
