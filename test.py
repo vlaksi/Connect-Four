@@ -25,47 +25,10 @@ from tk_html_widgets import HTMLLabel
 from threading import Thread, Event
 import time
 
-
-
 while (1):
     gameMode = easygui.enterbox("Unesite 1 ili 2 (mod 1 je mod u kom AI igra po MINMAX algoritmu, mod 2 je mod u kom AI igra po predikciji numerike na osnovu istreniranog dataseta  ")
     if(gameMode == '1' or gameMode == '2'):
         break
-
-# Event object used to send signals from one thread to another
-stop_event = Event()
-
-def do_actions(red,kolona):
-    """
-    Function that should timeout after 5 seconds. It simply prints a number and waits 1 second.
-    :return:
-    """
-    print(kolona)
-    print(red)
-    for i in range(5,red,-1):
-        print(i)
-        for j in range(2):
-            pygame.draw.circle(screen, ZUTA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int((i*VELICINA_KVADRATA+VELICINA_KVADRATA/2))), RADIUS)
-            pygame.display.update()
-            time.sleep(0.020)
-            pygame.draw.circle(screen, SIVA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(i*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
-            pygame.display.update()
-            time.sleep(0.00001)
-
-
-
-def fizika(red,kolona):
-    # We create another Thread
-    action_thread = Thread(target=do_actions,args=(red,kolona))
- 
-    # Here we start the thread and we wait 5 seconds before the code continues to execute.
-    action_thread.start()
-    action_thread.join(timeout=5)
- 
-    # We send a signal that the other thread should stop.
-    stop_event.set()
- 
-    print("Hey there! I timed out! You can do things after me!")
 
 PLAYER = 0
 AI = 1
@@ -87,6 +50,70 @@ green = (0,200,0)
 
 bright_red = (255,0,0)
 bright_green = (0,255,0)
+
+# Event objekat koji sluzi da salje signale od jedne do druge niti
+stop_event = Event()
+
+# F-j koja implementira spustanje tokena. Ceka 5 sekundi u kojima se vrsi simulacija fizike.
+def spusti_token(red,kolona,boja):
+    # Od gornjeg dela do reda u kom smo vrsimo spustanje tokena.
+    for i in range(5,red,-1):
+        pygame.draw.circle(screen, boja, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int((i*VELICINA_KVADRATA+VELICINA_KVADRATA/2))), RADIUS)
+        pygame.display.update()
+        time.sleep(0.020)
+        if i != red:
+            pygame.draw.circle(screen, SIVA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(i*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+            pygame.display.update()
+            time.sleep(0.00001)
+
+    # Simuliramo skakutanje naseg tokena u zavisnosti od reda.
+    if red == 0 or red == 1 or red == 2:
+        for i in range(red,3+red,1):
+            skaci(boja,i,kolona)
+        for i in range(3+red,red,-1):
+            skaci(boja,i,kolona)
+        for i in range(red,2+red,1):
+            skaci(boja,i,kolona)
+        for i in range(2+red,red,-1):
+            skaci(boja,i,kolona)
+        for i in range(red,1+red,1):
+            skaci(boja,i,kolona)
+        for i in range(1+red,red,-1):
+            skaci(boja,i,kolona)
+    if red == 3:
+        for i in range(red,2+red,1):
+            skaci(boja,i,kolona)
+        for i in range(2+red,red,-1):
+            skaci(boja,i,kolona)
+        for i in range(red,1+red,1):
+            skaci(boja,i,kolona)
+        for i in range(1+red,red,-1):
+            skaci(boja,i,kolona)
+
+
+# F-ja za simulaciju skakanja.
+def skaci(boja,i,kolona):
+    pygame.draw.circle(screen, boja, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int((i*VELICINA_KVADRATA+VELICINA_KVADRATA/2))), RADIUS)
+    pygame.display.update()
+    time.sleep(0.1)
+    pygame.draw.circle(screen, SIVA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(i*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+    pygame.display.update()
+    time.sleep(0.00001)
+
+
+# F-ja u kojoj pomocu niti vrsimo simulaciju fizike.
+def fizika(red,kolona,boja):
+    # Kreiramo novu nit
+    action_thread = Thread(target=spusti_token,args=(red,kolona,boja))
+ 
+    # I potom je pozivamo i damo joj maksimalno 5 sekundi da se izvrsi.
+    action_thread.start()
+    action_thread.join(timeout=5)
+ 
+    # Dajemo signal ostalim nitima da sacekaju izvrsavanje nase niti.
+    stop_event.set()
+    #print("Hey there! I timed out! You can do things after me!")
+
 
 # Dve liste koje sluze iscitavanje trainingSet kako bi vrsil numericke proracune nad njima
 x = []
@@ -618,7 +645,7 @@ while not game_over:
                     if da_li_je_popunjena_kolona(tabla,kolona):
                         red = get_sledeci_slobodan_red(tabla,kolona)
                         postavi_token(tabla,red,kolona,PLAYER_TOKEN)
-                        fizika(red,kolona)
+                        fizika(red,kolona,ZUTA)
                         if winning_move(tabla,PLAYER_TOKEN):
                             label = myfont.render("POBEDA ZUTOG !!", 1, CRNA)
                             screen.blit(label, (10,5))
@@ -671,7 +698,7 @@ while not game_over:
         if da_li_je_popunjena_kolona(tabla,kolona):
             red = get_sledeci_slobodan_red(tabla,kolona)
             postavi_token(tabla,red,kolona,AI_TOKEN)
-        
+            fizika(red,kolona,CRNA)
             # Promenljive koje su nam potrebne za cuvanje u traningSetu
             brojPoteza=0
             brojKolone=0
