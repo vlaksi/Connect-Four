@@ -22,11 +22,50 @@ import easygui
 import random
 import tkinter as tk
 from tk_html_widgets import HTMLLabel
+from threading import Thread, Event
+import time
+
+
 
 while (1):
     gameMode = easygui.enterbox("Unesite 1 ili 2 (mod 1 je mod u kom AI igra po MINMAX algoritmu, mod 2 je mod u kom AI igra po predikciji numerike na osnovu istreniranog dataseta  ")
     if(gameMode == '1' or gameMode == '2'):
         break
+
+# Event object used to send signals from one thread to another
+stop_event = Event()
+
+def do_actions(red,kolona):
+    """
+    Function that should timeout after 5 seconds. It simply prints a number and waits 1 second.
+    :return:
+    """
+    print(kolona)
+    print(red)
+    for i in range(5,red,-1):
+        print(i)
+        for j in range(2):
+            pygame.draw.circle(screen, ZUTA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int((i*VELICINA_KVADRATA+VELICINA_KVADRATA/2))), RADIUS)
+            pygame.display.update()
+            time.sleep(0.020)
+            pygame.draw.circle(screen, SIVA, (int(kolona*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(i*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
+            pygame.display.update()
+            time.sleep(0.00001)
+
+
+
+def fizika(red,kolona):
+    # We create another Thread
+    action_thread = Thread(target=do_actions,args=(red,kolona))
+ 
+    # Here we start the thread and we wait 5 seconds before the code continues to execute.
+    action_thread.start()
+    action_thread.join(timeout=5)
+ 
+    # We send a signal that the other thread should stop.
+    stop_event.set()
+ 
+    print("Hey there! I timed out! You can do things after me!")
 
 PLAYER = 0
 AI = 1
@@ -75,9 +114,18 @@ def kreiraj_tablu():
 def stampaj_tablu(tabla):
     print(np.flip(tabla,0))
 
+# F-ja za simulaciju fizike
+def bar():
+    for i in range(100):
+        print ("Tick")
+        time.sleep(1)
+
+
 #F-ja koja postavlja token na odgovarajucu poziciju u matrici
 def postavi_token(tabla,red,kolona,token):
     tabla[red][kolona] = token
+
+
 
 #F-ja koja provera da li je validna lokacija, tj da li je 5 red prosledjene kolone slobodan
 def da_li_je_popunjena_kolona(tabla, kolona):
@@ -570,7 +618,7 @@ while not game_over:
                     if da_li_je_popunjena_kolona(tabla,kolona):
                         red = get_sledeci_slobodan_red(tabla,kolona)
                         postavi_token(tabla,red,kolona,PLAYER_TOKEN)
-
+                        fizika(red,kolona)
                         if winning_move(tabla,PLAYER_TOKEN):
                             label = myfont.render("POBEDA ZUTOG !!", 1, CRNA)
                             screen.blit(label, (10,5))
