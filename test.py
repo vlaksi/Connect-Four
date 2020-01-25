@@ -10,6 +10,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib
 matplotlib.rcParams.update({'font.size': 12})
+from matplotlib.pylab import rcParams
+rcParams['figure.figsize'] = 18, 10
 from sklearn.datasets import load_boston
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
@@ -47,7 +49,23 @@ green = (0,200,0)
 bright_red = (255,0,0)
 bright_green = (0,255,0)
 
+# Dve liste koje sluze iscitavanje trainingSet kako bi vrsil numericke proracune nad njima
+x = []
+y = []
 pom_y = []
+
+# Iscitavanje iz fajla i smestanje u liste x i y
+with open('trainingSet.csv', 'r') as csvfile:
+    citac = csv.reader(csvfile, delimiter='\t')
+    next(citac)
+    for entitet in citac:
+        x.append(int(entitet[0]))
+        y.append(int(entitet[1]))
+
+# Ispisivanje ucitanih lista
+#print(x)
+#print(y)
+
 #F-ja koja kreira matricu 6 puta 6, koja predstavlja tablu
 def kreiraj_tablu():
     tabla = np.zeros((BROJ_REDOVA,BROJ_KOLONA))
@@ -293,6 +311,31 @@ def ridge_regression(data, predictors, alpha):
     ret.extend(ridgereg.coef_)
     return ret
 
+def ridge_regression_PLOTOVANJE(data, predictors, alpha, models_to_plot={}):
+    #Fit the model
+    ridgereg = Ridge(alpha=alpha,normalize=True)
+    ridgereg.fit(data[predictors],data['y'])
+    y_pred = ridgereg.predict(data[predictors])
+
+    print("Predikcija poteza", y_pred)
+    
+    #Check if a plot is to be made for the entered alpha
+    if alpha in models_to_plot:
+        plt.subplot(models_to_plot[alpha])
+        plt.tight_layout()
+        plt.plot(data['x'],y_pred)
+        plt.plot(data['x'],data['y'],'.')
+        plt.title('Plot for alpha: %.3g'%alpha)
+        plt.draw()
+        plt.pause(1)
+
+    #Return the result in pre-defined format
+    rss = sum((y_pred-data['y'])**2)
+    ret = [rss]
+    ret.extend([ridgereg.intercept_])
+    ret.extend(ridgereg.coef_)
+    return ret
+
 class DynamicArray(object): 
     ''' 
     DYNAMIC ARRAY CLASS (Similar to Python List) 
@@ -376,21 +419,7 @@ if turn == PLAYER:
 # Inijalizacija dinamickog niza
 nizPoteza = DynamicArray() 
 
-# Dve liste koje sluze iscitavanje trainingSet kako bi vrsil numericke proracune nad njima
-x = []
-y = []
 
-# Iscitavanje iz fajla i smestanje u liste x i y
-with open('trainingSet.csv', 'r') as csvfile:
-    citac = csv.reader(csvfile, delimiter='\t')
-    next(citac)
-    for entitet in citac:
-        x.append(int(entitet[0]))
-        y.append(int(entitet[1]))
-
-# Ispisivanje ucitanih lista
-print(x)
-print(y)
 while not game_over:
 
     # Prolazak kroz Event Lisenere od koristi i njihova implementacija
@@ -417,6 +446,11 @@ while not game_over:
             else:
                 pygame.draw.rect(screen, SIVA,(300,725,160,50))    
 
+            if 300+100 > mouse[0] > 300 and 800+50 > mouse[1] > 800:
+                pygame.draw.rect(screen, TAMNO_SIVA,(300,800,160,50))
+            else:
+                pygame.draw.rect(screen, SIVA,(300,800,160,50))   
+
             label1 = fontZaButtn.render("Pomoc", 1, CRNA)
             label2 = fontZaButtn.render("numerike", 1, CRNA)
             screen.blit(label1, (348,655)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
@@ -426,6 +460,11 @@ while not game_over:
             label4 = fontZaButtn.render("numerike", 1, CRNA)
             screen.blit(label3, (338,730)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
             screen.blit(label4, (333,750))
+
+            label5 = fontZaButtn.render("Training", 1, CRNA)
+            label6 = fontZaButtn.render("data set", 1, CRNA)
+            screen.blit(label5, (332,805)) #Prvi parametar x pozicija texta, drugi parametar y pozicija
+            screen.blit(label6, (331,825))
         
           
             
@@ -433,6 +472,47 @@ while not game_over:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             pygame.draw.rect(screen, BELA, (0,0, width, VELICINA_KVADRATA))
+
+            if 300+100 > mouse[0] > 300 and 800+50 > mouse[1] > 800:   
+                x = sorted(x)         
+                data = pd.DataFrame(np.column_stack([x,y]),columns=['x','y'])
+                #plt.plot(data['x'],data['y'],'.')
+                #plt.show()
+
+                for i in range(2,16):  #power of 1 is already there
+                    colname = 'x_%d'%i      #new var will be x_power
+                    data[colname] = data['x']**i
+                print (data.head())
+
+                #Initialize predictors to be set of 15 powers of x
+                predictors=['x']
+                predictors.extend(['x_%d'%i for i in range(2,16)])
+
+                #Set the different values of alpha to be tested
+                alpha_ridge = [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]
+
+                #Initialize the dataframe for storing coefficients.
+                col = ['rss','intercept'] + ['coef_x_%d'%i for i in range(1,16)]
+                ind = ['alpha_%.2g'%alpha_ridge[i] for i in range(0,10)]
+                coef_matrix_ridge = pd.DataFrame(index=ind, columns=col)
+                
+                
+                
+                models_to_plot = {1e-15:231, 1e-10:232, 1e-4:233, 1e-3:234, 1e-2:235, 5:236}
+                for i in range(10):
+                    coef_matrix_ridge.iloc[i,] = ridge_regression_PLOTOVANJE(data, predictors, alpha_ridge[i], models_to_plot)
+                plt.show()
+                # plt.ion()
+                   
+                # for i in range(50):
+                #     y = np.random.random([10,1])
+                #     plt.plot(y)
+                #     plt.draw()
+                #     plt.pause(0.0001)
+                #     plt.clf()
+
+
+
 
             if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
                 root = tk.Tk()
@@ -475,9 +555,9 @@ while not game_over:
                 coef_matrix_ridge.iloc[0,] = ridge_regression(data, predictors, alpha_ridge[0])
 
                 if indikator==-1:
-                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)) + " odigraj " + str(int(round(pom_y[len(nizPoteza)]))), "Predlog poteza", 1)
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)) + " odigraj " + str(int(round(pom_y[len(nizPoteza)]))), "Predlog poteza", 4096)
                 else:
-                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)+1) + " odigraj " + str(int(round(pom_y[len(nizPoteza)+1]))), "Predlog poteza", 1)
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)+1) + " odigraj " + str(int(round(pom_y[len(nizPoteza)+1]))), "Predlog poteza", 4096)
                 
             
             if turn == PLAYER:
