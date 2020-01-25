@@ -16,6 +16,13 @@ from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
 from sklearn.linear_model import Ridge
 import ctypes
+import easygui
+import random
+
+while (1):
+    gameMode = easygui.enterbox("Unesite 1 ili 2 (mod 1 je mod u kom AI igra po MINMAX algoritmu, mod 2 je mod u kom AI igra po predikciji numerike na osnovu istreniranog dataseta  ")
+    if(int(gameMode) == 1 or int(gameMode) ==2):
+        break
 
 
 PLAYER = 0
@@ -475,7 +482,39 @@ while not game_over:
         #kolona = random.randint(0,BROJ_KOLONA-1)
         #kolona = izaberi_najbolji_potez(tabla,AI_TOKEN)
         # Podesavanjem depth-a , tj drugog parametra uticemo na tezinu igre
-        kolona, minimax_score = minimax(tabla, 4, -math.inf, math.inf, True)
+        if(int(gameMode) == 1):
+            kolona, minimax_score = minimax(tabla, 4, -math.inf, math.inf, True)
+        else: 
+            data = pd.DataFrame(np.column_stack([x,y]),columns=['x','y'])
+            for i in range(2,16):  #power of 1 is already there
+                colname = 'x_%d'%i      #new var will be x_power
+                data[colname] = data['x']**i
+
+            #Initialize predictors to be set of 15 powers of x
+            predictors=['x']
+            predictors.extend(['x_%d'%i for i in range(2,16)])
+
+            #Set the different values of alpha to be tested
+            #alpha_ridge = [1e-15, 1e-10, 1e-8, 1e-4, 1e-3,1e-2, 1, 5, 10, 20]
+            alpha_ridge = [1e-4]
+
+            #Initialize the dataframe for storing coefficients.
+            col = ['rss','intercept'] + ['coef_x_%d'%i for i in range(1,16)]
+            ind = ['alpha_%.2g'%alpha_ridge[0]]
+            coef_matrix_ridge = pd.DataFrame(index=ind, columns=col)
+
+            models_to_plot = {1e-4:233}  
+    
+            coef_matrix_ridge.iloc[0,] = ridge_regression(data, predictors, alpha_ridge[0])
+
+            kolona = int(round(pom_y[len(nizPoteza)]))
+
+            while not da_li_je_popunjena_kolona(tabla,kolona):
+                kolona = random.choice([0, 1, 2, 3, 4, 5])
+                # kolona = kolona +1
+                # if kolona == 6:
+                #     kolona = 0
+
 
         if da_li_je_popunjena_kolona(tabla,kolona):
             red = get_sledeci_slobodan_red(tabla,kolona)
