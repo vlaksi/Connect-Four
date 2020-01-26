@@ -11,7 +11,7 @@ import pandas as pd
 import matplotlib
 matplotlib.rcParams.update({'font.size': 12})
 from matplotlib.pylab import rcParams
-rcParams['figure.figsize'] = 18, 10
+rcParams['figure.figsize'] = 8, 6
 from sklearn.datasets import load_boston
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
@@ -204,14 +204,11 @@ def iscrtaj_tablu(tabla):
             elif tabla[r][c] == AI_TOKEN:
                 pygame.draw.circle(screen, CRNA, (int(c*VELICINA_KVADRATA+VELICINA_KVADRATA/2), height - int(r*VELICINA_KVADRATA+VELICINA_KVADRATA/2)), RADIUS)
 
-
     pygame.draw.rect(screen, BELA, (200,630, 500, 500))
     #Ucitavamo sliku
     myimage = pygame.image.load("numerika.png")
     screen.blit(myimage, (0, 630)) #Parametri blit-a su slika, (xPozicija,yPozicija)
                                      #Blit je termin koji se koristi za renderovanje
-
-
 
     pygame.display.update()
 
@@ -354,7 +351,6 @@ def lasso_regression(data, predictors, alpha, models_to_plot={}):
     y_pred = lassoreg.predict(data[predictors])
     print("Predikcija poteza", y_pred)
   
-    
     #Return the result in pre-defined format
     rss = sum((y_pred-data['y'])**2)
     ret = [rss]
@@ -377,7 +373,6 @@ def ridge_regression(data, predictors, alpha):
     
     for x in range(len(pom_y)):
         print("Predikcija za potez ", x+1 , round(abs(pom_y[x])))
-
 
     #Return the result in pre-defined format
     rss = sum((y_pred-data['y'])**2)
@@ -412,24 +407,18 @@ def ridge_regression_PLOTOVANJE(data, predictors, alpha, models_to_plot={}):
     return ret
 
 class DynamicArray(object): 
-    ''' 
-    DYNAMIC ARRAY CLASS (Similar to Python List) 
-    '''
+    #DYNAMIC ARRAY CLASS (Similar to Python List) 
     def __init__(self): 
         self.n = 0 # Count actual elements (Default is 0) 
         self.capacity = 1 # Default Capacity 
         self.A = self.make_array(self.capacity) 
           
     def __len__(self): 
-        """ 
-        Return number of elements sorted in array 
-        """
+        #Return number of elements sorted in array 
         return self.n 
       
     def __getitem__(self, k): 
-        """ 
-        Return element at index k 
-        """
+        #Return element at index k 
         if not 0 <= k <self.n: 
             # Check it k index is in bounds of array 
             return IndexError('K is out of bounds !')  
@@ -437,9 +426,7 @@ class DynamicArray(object):
         return self.A[k] # Retrieve from the array at index k 
           
     def append(self, ele): 
-        """ 
-        Add element to end of the array 
-        """
+        #Add element to end of the array 
         if self.n == self.capacity: 
             # Double capacity if not enough room 
             self._resize(2 * self.capacity)  
@@ -447,11 +434,8 @@ class DynamicArray(object):
         self.A[self.n] = ele # Set self.n index to element 
         self.n += 1
           
-    def _resize(self, new_cap): 
-        """ 
-        Resize internal array to capacity new_cap 
-        """
-          
+    def _resize(self, new_cap):  
+        #Resize internal array to capacity new_cap 
         B = self.make_array(new_cap) # New bigger array 
           
         for k in range(self.n): # Reference all existing values 
@@ -461,9 +445,7 @@ class DynamicArray(object):
         self.capacity = new_cap # Reset the capacity 
           
     def make_array(self, new_cap): 
-        """ 
-        Returns a new array with new_cap capacity 
-        """
+        #Returns a new array with new_cap capacity 
         return (new_cap * ctypes.py_object)() 
 
 tabla = kreiraj_tablu()
@@ -493,6 +475,7 @@ if turn == PLAYER:
 
 # Inijalizacija dinamickog niza
 nizPoteza = DynamicArray() 
+
 
 
 while not game_over:
@@ -570,22 +553,11 @@ while not game_over:
                 col = ['rss','intercept'] + ['coef_x_%d'%i for i in range(1,16)]
                 ind = ['alpha_%.2g'%alpha_ridge[i] for i in range(0,10)]
                 coef_matrix_ridge = pd.DataFrame(index=ind, columns=col)
-                
-                
-                
+                         
                 models_to_plot = {1e-15:231, 1e-10:232, 1e-4:233, 1e-3:234, 1e-2:235, 5:236}
                 for i in range(10):
                     coef_matrix_ridge.iloc[i,] = ridge_regression_PLOTOVANJE(data, predictors, alpha_ridge[i], models_to_plot)
                 plt.show()
-                # plt.ion()
-                   
-                # for i in range(50):
-                #     y = np.random.random([10,1])
-                #     plt.plot(y)
-                #     plt.draw()
-                #     plt.pause(0.0001)
-                #     plt.clf()
-
 
             if 300+100 > mouse[0] > 300 and 725+50 > mouse[1] > 725:
                 root = tk.Tk()
@@ -626,9 +598,9 @@ while not game_over:
                 coef_matrix_ridge.iloc[0,] = ridge_regression(data, predictors, alpha_ridge[0])
 
                 if indikator==-1:
-                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)) + " odigraj " + str(int(round(pom_y[len(nizPoteza)]))), "Predlog poteza", 4096)
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U Vasem potezu " + str(len(nizPoteza)) + " po mom predjasnjem iskustvo najbolje je odigrati kolonu " + str(int(round(pom_y[len(nizPoteza)]))), "Predlog poteza", 4096)
                 else:
-                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U vasem potezu " + str(len(nizPoteza)+1) + " odigraj " + str(int(round(pom_y[len(nizPoteza)+1]))), "Predlog poteza", 4096)
+                    ctypes.windll.user32.MessageBoxW(0, "Pomoc"+ " numerike : U Vasem potezu " + str(len(nizPoteza)+1) + " po mom predjasnjem iskustvo najbolje je odigrati kolonu " + str(int(round(pom_y[len(nizPoteza)+1]))), "Predlog poteza", 4096)
                 
             
             if turn == PLAYER:
