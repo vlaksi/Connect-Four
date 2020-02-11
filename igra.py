@@ -9,9 +9,7 @@ import csv
 import matplotlib.pyplot as plt
 import pandas as pd
 import matplotlib
-matplotlib.rcParams.update({'font.size': 12})
 from matplotlib.pylab import rcParams
-rcParams['figure.figsize'] = 8, 6
 from sklearn.datasets import load_boston
 #from sklearn.cross_validation import train_test_split
 from sklearn.model_selection import train_test_split
@@ -29,6 +27,9 @@ while (1):
     gameMode = easygui.enterbox("Unesite 1 ili 2 (mod 1 je mod u kom AI igra po MINMAX algoritmu, mod 2 je mod u kom AI igra po predikciji numerike na osnovu istreniranog dataseta  ")
     if(gameMode == '1' or gameMode == '2'):
         break
+
+rcParams['figure.figsize'] = 8, 6
+matplotlib.rcParams.update({'font.size': 12})
 
 PLAYER = 0
 AI = 1
@@ -206,7 +207,7 @@ def iscrtaj_tablu(tabla):
 
     pygame.draw.rect(screen, BELA, (200,630, 500, 500))
     #Ucitavamo sliku
-    myimage = pygame.image.load("numerika.png")
+    myimage = pygame.image.load("picture/numerika.png")
     screen.blit(myimage, (0, 630)) #Parametri blit-a su slika, (xPozicija,yPozicija)
                                      #Blit je termin koji se koristi za renderovanje
 
@@ -563,7 +564,7 @@ while not game_over:
                 root = tk.Tk()
                 root.title("Ispod haube")
 
-                html_label = HTMLLabel(root, html='<html><div><h1> ----------------- Princip numerike ----------------- </h1> <h4>Princip na kome radi numerika je zasnovan na regresiji i regulaciji. Metode koje koristimo su: Ridge i Lasso metoda takozvane L1 i L2 metode.<br><br>Nas program se samostalno trenira tokom kontinuiranog igranja, odnosno sto vise budemo igrali igru, dobijacemo bolje predikcije tj. savete koja kolona je najbolja da se odigra u sledecem potezu na osnovu naseg predjasnjeg iskustva u igranju protiv AI-a.<br> <br> Voditi racuna da MOD 2 nije optimalan na pocetku vaseg igranja, sto znaci da ce on tek postati kompetentan sa sve vecim vasim igranjem igre, zato sto se zasniva na podacima koje prikuplja od vaseg igranja protiv AI-a.<img src="podaci.png"  width="600" height="350"><br><br>Kada nismo sigurni gde je najpametnije odigrati sledeci potez, nasa numerika ce tada izvrsiti regresiju i regulaciju i reci nam koji potez je optimalan.</h6> <h1> ---------------------- Metode ---------------------- </h1> <p> Metode koje uvode kaznenu funkciju tj. izraz zvan penal, a time koriguju izgled nase krive koja nam saopstava naredni potez su Lasso, Ridge metode. </p><img src="Lm.png" width="600" height="100">  </div></html>')
+                html_label = HTMLLabel(root, html='<html><div><h1> ----------------- Princip numerike ----------------- </h1> <h4>Princip na kome radi numerika je zasnovan na regresiji i regulaciji. Metode koje koristimo su: Ridge i Lasso metoda takozvane L1 i L2 metode.<br><br>Nas program se samostalno trenira tokom kontinuiranog igranja, odnosno sto vise budemo igrali igru, dobijacemo bolje predikcije tj. savete koja kolona je najbolja da se odigra u sledecem potezu na osnovu naseg predjasnjeg iskustva u igranju protiv AI-a.<br> <br> Voditi racuna da MOD 2 nije optimalan na pocetku vaseg igranja, sto znaci da ce on tek postati kompetentan sa sve vecim vasim igranjem igre, zato sto se zasniva na podacima koje prikuplja od vaseg igranja protiv AI-a.<img src="picture/podaci.png"  width="600" height="350"><br><br>Kada nismo sigurni gde je najpametnije odigrati sledeci potez, nasa numerika ce tada izvrsiti regresiju i regulaciju i reci nam koji potez je optimalan.</h6> <h1> ---------------------- Metode ---------------------- </h1> <p> Metode koje uvode kaznenu funkciju tj. izraz zvan penal, a time koriguju izgled nase krive koja nam saopstava naredni potez su Lasso, Ridge metode. </p><img src="picture/Lm.png" width="600" height="100">  </div></html>')
                 html_label.pack(fill="both", expand=True)
                 html_label.fit_height()
                 root.mainloop()
