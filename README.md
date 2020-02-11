@@ -1,20 +1,19 @@
-<h1 align = "center"> Nacin pokretanja </h1>
+﻿<h1 align = "center"> Nacin pokretanja </h1>
 
-## Prvi nacin 
+## Pokretanje
 <p align = "left">
-  
- Za pokretanje igre, generisali smo .exe fajl kom mozete direktno pristupiti na bilo kom racunaru. Preuzimanjem repozitorijuma i pokretanjem test.exe, pokrece se igra.
- 
+
+Kako bi preuzeli igru, mozete jednostavno klonirati repozitorijum na vasem racunaru, ili skinuti zipovan projekat. Kako bi instalirali sve biblioteke i pokrenuli igru pomocu nekog od okruzenja koje podrzava Python, morate uraditi sledece.
+
+  - Pozicionirate se gde se nalazi nasa igra, tacnije folder requirements.txt
+  - Otvorite tu cmd i ukucate sledece:
+**pip install -r requirements.txt**
+  - Kada se zavrsi instalacija svih biblioteka ostaje nam instalacija jos jedne biblioteke tj.
+**pip install tk_html_widgets**
+
+Nakon toga mozemo otvoriti kod u kom zelimo okruzenju Pycharm,Sublime itd. i igrati igru.
+
  </p>
-
-## Drugi nacin
-
-<p align = "left">
-  
-Instalirati pip na Vas racunar, kao i potrebne biblioteke u kojima smo radili, pygame, numpy... Sve potrebne biblioteke koje morate da instalirate nalaze se u "requirements.txt" fajlu. Vrlo jednostavno možete intalirati sve potrebne biblioteke tako što će te u CMD ukucati "pip install -r /path/to/requirements.txt" . Kada instalirate sve potrebne biblioteke i Python na Vas racunar bicete u mogucnosti da pokrenete kod, dvoklikom na .py datoteku pokrenuce se konzola kao i GUI aplikacija.
-
-</p>
-
 
 
 <h1 align = "center"> Nacin igranja </h1>
