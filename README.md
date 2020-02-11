@@ -11,7 +11,7 @@
 
 <p align = "left">
   
-Instalirati pip na Vas racunar, kao i potrebne biblioteke u kojima smo radili, pygame, numpy... Sve potrebne biblioteke koje morate da instalirate nalaze se u "requirements.txt" fajlu. Kada instalirate sve potrebne biblioteke i Python na Vas racunar bicete u mogucnosti da pokrenete kod, dvoklikom na .py datoteku pokrenuce se konzola kao i GUI aplikacija.
+Instalirati pip na Vas racunar, kao i potrebne biblioteke u kojima smo radili, pygame, numpy... Sve potrebne biblioteke koje morate da instalirate nalaze se u "requirements.txt" fajlu. Vrlo jednostavno možete intalirati sve potrebne biblioteke tako što će te u CMD ukucati "pip install -r /path/to/requirements.txt" . Kada instalirate sve potrebne biblioteke i Python na Vas racunar bicete u mogucnosti da pokrenete kod, dvoklikom na .py datoteku pokrenuce se konzola kao i GUI aplikacija.
 
 </p>
 
