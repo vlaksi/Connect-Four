@@ -12,7 +12,7 @@ $ pip install -r requirements.txt
 ```
 
 ## Pokretanje aplikacije
-Potrebno je da se pozicionirate u okvir direktorijum vas_path/Connect-Four/ koji ste prethodno skinuli/klonovali. A potom na sledeci nacin mozete pokrenuti aplikaciju:
+Potrebno je da se pozicionirate u okvir direktorijuma vas_path/Connect-Four/ koji ste prethodno skinuli/klonovali. A potom na sledeci nacin mozete pokrenuti aplikaciju:
 ```sh
 $ python igra.py
 ```
